@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clipper IA</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/">
+      <span class="logo">▶</span>
+      <span>Clipper <span class="accent">IA</span></span>
+    </a>
+    <span id="engine" class="pill">…</span>
+  </header>
+
+  <main id="home" class="page">
+    <section class="hero">
+      <p class="eyebrow">DE VIDEO LARGO A CLIPS VIRALES</p>
+      <h1>Sube un video y recibe clips verticales listos para TikTok, Reels y Shorts.</h1>
+      <p class="lead">La IA encuentra los mejores momentos, los recorta a 9:16 siguiendo al que habla y agrega subtítulos animados.</p>
+    </section>
+
+    <form id="form" class="card form">
+      <div class="tabs" role="tablist">
+        <button type="button" class="tab active" data-tab="file">Subir archivo</button>
+        <button type="button" class="tab" data-tab="url">Pegar enlace</button>
+      </div>
+
+      <label id="drop" class="drop" data-pane="file">
+        <input id="file" type="file" accept="video/*" hidden>
+        <strong id="drop-title">Arrastra tu video aquí</strong>
+        <span id="drop-sub">o haz clic para elegirlo · MP4, MOV, MKV, WEBM</span>
+      </label>
+
+      <div data-pane="url" hidden>
+        <input id="url" class="input" type="url" placeholder="https://www.youtube.com/watch?v=… o https://canal.tv/en-vivo.m3u8">
+        <p class="hint">Usa solo contenido propio o con permiso. Las transmisiones en vivo (.m3u8) se graban hasta 10 minutos.</p>
+      </div>
+
+      <div class="options">
+        <label>Clips
+          <input id="num_clips" class="input" type="number" min="1" max="20" value="5">
+        </label>
+        <label>Duración
+          <select id="duration" class="input">
+            <option value="20-60" selected>Auto (20–60 s)</option>
+            <option value="10-30">Corto (&lt;30 s)</option>
+            <option value="30-60">Medio (30–60 s)</option>
+            <option value="60-90">Largo (60–90 s)</option>
+            <option value="90-180">Extendido (90 s–3 min)</option>
+          </select>
+        </label>
+        <label>Formato
+          <select id="layout" class="input">
+            <option value="fill">Vertical · sigue la cara</option>
+            <option value="fit">Video completo · fondo difuminado</option>
+          </select>
+        </label>
+        <label>Subtítulos
+          <select id="caption_style" class="input">
+            <option value="viral">Viral (palabra resaltada)</option>
+            <option value="karaoke">Karaoke</option>
+            <option value="clasico">Clásico</option>
+            <option value="ninguno">Sin subtítulos</option>
+          </select>
+        </label>
+        <label>Idioma
+          <select id="language" class="input">
+            <option value="">Detectar</option>
+            <option value="es">Español</option>
+            <option value="en">Inglés</option>
+            <option value="pt">Portugués</option>
+          </select>
+        </label>
+      </div>
+      <label class="full">¿Qué tipo de momentos buscas? <span class="muted">(opcional)</span>
+        <input id="instructions" class="input" maxlength="500" placeholder="Ej.: los momentos más graciosos, solo consejos prácticos, las jugadas del partido…">
+      </label>
+
+      <div class="submit-row">
+        <div id="upload" class="progress" hidden><div></div></div>
+        <p id="form-error" class="error" hidden></p>
+        <button id="submit" class="button primary" type="submit">Generar clips</button>
+      </div>
+    </form>
+
+    <section>
+      <div class="section-head">
+        <h2>Mis proyectos</h2>
+      </div>
+      <div id="jobs" class="jobs"></div>
+    </section>
+  </main>
+
+  <main id="detail" class="page" hidden>
+    <a class="back" href="#/">← Proyectos</a>
+    <div class="detail-head">
+      <div>
+        <h1 id="d-title"></h1>
+        <p id="d-meta" class="muted"></p>
+      </div>
+      <button id="d-delete" class="button ghost" type="button">Eliminar</button>
+    </div>
+    <div id="d-status" class="card status"></div>
+    <div id="clips" class="clips"></div>
+  </main>
+
+  <template id="clip-template">
+    <article class="clip card">
+      <div class="player">
+        <video controls playsinline preload="none"></video>
+        <div class="busy" hidden><span class="spinner"></span>Generando…</div>
+        <span class="score"></span>
+      </div>
+      <div class="clip-body">
+        <p class="time muted"></p>
+        <h3 class="title"></h3>
+        <p class="hook"></p>
+        <div class="bars"></div>
+        <p class="reason muted"></p>
+        <div class="tags"></div>
+        <p class="clip-error error" hidden></p>
+        <div class="actions">
+          <a class="button primary download">Descargar</a>
+          <a class="button ghost srt">SRT</a>
+          <button class="button ghost copy" type="button">Copiar texto</button>
+          <button class="button ghost edit" type="button">Editar</button>
+        </div>
+        <form class="editor" hidden>
+          <div class="editor-grid">
+            <label>Inicio (s)<input class="input e-start" type="number" step="any" min="0"></label>
+            <label>Fin (s)<input class="input e-end" type="number" step="any" min="0"></label>
+            <label>Formato
+              <select class="input e-layout">
+                <option value="fill">Vertical · sigue la cara</option>
+                <option value="fit">Video completo</option>
+              </select>
+            </label>
+            <label>Subtítulos
+              <select class="input e-style">
+                <option value="viral">Viral</option>
+                <option value="karaoke">Karaoke</option>
+                <option value="clasico">Clásico</option>
+                <option value="ninguno">Sin subtítulos</option>
+              </select>
+            </label>
+          </div>
+          <button class="button primary" type="submit">Volver a generar</button>
+        </form>
+      </div>
+    </article>
+  </template>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
