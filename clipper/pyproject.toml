@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clipper-ia"
+version = "0.1.0"
+description = "Convierte videos largos en clips verticales con subtítulos y puntuación viral usando IA"
+requires-python = ">=3.10"
+dependencies = [
+  "anthropic>=1.15",
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "python-multipart>=0.0.9",
+  "pydantic>=2.7",
+  "numpy>=1.26",
+  "opencv-python-headless>=4.9,<5",  # OpenCV 5 eliminó los clasificadores Haar
+  "faster-whisper>=1.0",
+  "yt-dlp>=2024.8",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+clipper = "clipper.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["clipper*"]
+
+[tool.setuptools.package-data]
+clipper = ["static/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
